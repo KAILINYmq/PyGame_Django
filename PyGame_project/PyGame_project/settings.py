@@ -25,7 +25,7 @@ SECRET_KEY = 'f#hk_8zd91@$wzz&t=nj=ttq+*8fjfwvw*(3($plf3wqx@u=u$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',  # DRF
     'users',
 ]
 
@@ -86,6 +87,12 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+# CORS  追加白名单
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+)
 
 
 # Password validation
