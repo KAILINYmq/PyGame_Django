@@ -54,23 +54,25 @@ class CreateUserSerializer(serializers.ModelSerializer):
         print("MetaOK")
         model = User
         fields = ['username', 'password', 'password2', 'mobile', 'allow']
-        # extra_kwargs = {  # 对序列化器中的字段进行额外配置
-        #     'username': {
-        #         'min_length': 5,
-        #         'max_length': 20,
-        #         'error_messages': {  # 自定义反序列化校验错误信息
-        #             'min_length': '仅允许5-20个字符的用户名',
-        #             'max_length': '仅允许5-20个字符的用户名',
-        #         }
-        #     },
-        #     'password': {
-        #         'write_only': True,  # 只做反序列化
-        #         'min_length': 8,
-        #         'max_length ': 20,
-        #         'error_messages': {
-        #             'min_length': '仅允许8-20个字符的密码',
-        #             'max_length': '仅允许8-20个字符的密码',
-        #         }
-        #     }
-        # }
+        extra_kwargs = {  # 对序列化器中的字段进行额外配置
+            'username': {
+                # 'min_length': 5,
+                # 'max_length': 20,
+                'error_messages': {  # 自定义反序列化校验错误信息
+                    # 'min_length': '仅允许5-20个字符的用户名',
+                    'max_length': '仅允许5-20个字符的用户名',
+                }
+            },
+            'password': {
+                'write_only': True,  # 只做反序列化
+                # 'min_length': 8,
+                # 'max_length ': 20,
+                'error_messages': {
+                    # 'min_length': '仅允许8-20个字符的密码',
+                    'max_length': '仅允许8-20个字符的密码',
+                }
+            }
+        }
 
+class OnLine(serializers.ModelSerializer):
+    """登陆序列化机"""

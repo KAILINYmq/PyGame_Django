@@ -20,4 +20,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     # 用户登陆模块
     url(r'^', include('users.url')),
+    # 游戏页面数据模块
+    url(r'^', include('goods.urls')),
 ]
