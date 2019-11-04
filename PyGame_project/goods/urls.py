@@ -13,6 +13,6 @@ urlpatterns = [
     # 游戏详情页接口
     url(r'^categories/(?P<id>\d+)/page/$', views.GamePage.as_view()),
     # 游戏详情页
-    url(r'^Category/(?P<id>\d+)/sks/$', views.Category_page_list.as_view()),
+    url(r'^categorys/(?P<id>\d+)/skus/$', views.Category_page_list.as_view()),
 ]
 

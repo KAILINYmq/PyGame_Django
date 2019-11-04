@@ -42,12 +42,13 @@ class Gamecategory(serializers.ModelSerializer):
         model = GoodsCategory
         fields = ('id', 'name')
 
-class IndexSKU1(serializers.ModelSerializer):
+
+class categorySku(serializers.ModelSerializer):
     """
     SKU序列器
     """
-    category = serializers.CharField(source='category.name')
-
     class Meta:
         model = SKU
-        fields = ('id', 'title', 'logo_url', 'category')
+        # fields = ('id', 'title', 'logo_url')
+        fields = ('id', 'create_time', 'title', 'game_content', 'category', 'user_id', 'zan_id',
+                  'logo_url', 'img1_url', 'img2_url', 'game_file')
