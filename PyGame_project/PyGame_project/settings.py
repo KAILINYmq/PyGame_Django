@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.11/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
-
+import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -25,7 +25,7 @@ SECRET_KEY = 'f#hk_8zd91@$wzz&t=nj=ttq+*8fjfwvw*(3($plf3wqx@u=u$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.43.175', 'www.ymq.site', '10.102.49.34']
 
 
 # Application definition
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',    # 解决跨域问题, 此中间必须 放在所有中间件的最外层
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,7 +58,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'PyGame_project.urls'
 
-AUTH_USER_MODEL = 'users.User'
 
 TEMPLATES = [
     {
@@ -92,12 +92,39 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    # 异常处理
+    # 'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': (     # 指定项目全局的认证类
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',  # JWT认证方案  默认
+        'rest_framework.authentication.SessionAuthentication',  # session认证制
+        'rest_framework.authentication.BasicAuthentication',  # 基础认证
+    ),
+}
+
+# 设置JWT有效期
+JWT_AUTH = {
+     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),  # days:保存一天
+     'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',  # 修改jwt登录的响应数据
+}
+
+
+# Django认证系统使用的模型类
+AUTH_USER_MODEL = 'users.User'
+# Django的认证后端方法 (登陆)
+AUTHENTICATION_BACKENDS = [
+    'users.utils.UsernameMobileAuthBackend',
+]
+
 # CORS  追加白名单
 CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:8000',
     'http://localhost:8000',
+    'http://www.ymq.site:8000',
+    'http://192.168.43.175:8000',
 )
 
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators

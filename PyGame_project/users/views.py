@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 # Create your views here.
-from .serializers import CreateUserSerializer
+from .serializers import CreateUserSerializer, Chage_Password
 from .models import User
 
 class UsernameCountView(APIView):
@@ -55,14 +55,31 @@ class UserView(CreateAPIView):
 
 
 class UserAuthorizationView(ObtainJSONWebToken):
-    """用户登陆"""
+    """
+    用户登陆
+    """
+    # TODO PASS
     def post(self, request):
         response = super().post(request)
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            # TODO 有bug "无法使用提供的认证信息登录。"
             # 表示用户登陆成功
             user = serializer.validated_data.get("user")
 
         return response
+
+
+class Changepassword(CreateAPIView):
+    """
+    修改密码
+    """
+    # TODO 修改密码
+    # def post(self, request):
+    #     # 调用jwt父类的扩展方法，对用户登录的数据进行验证
+    #     response = super().post(request)
+    #
+    #     serializer = self.get_serializer(data=request.data)
+    #     if serializer.is_valid():
+    #         # 如果用户登陆则修改密码
+    #         serializer_class = Chage_Password  # 序列化器

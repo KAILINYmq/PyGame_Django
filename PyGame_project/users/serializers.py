@@ -1,6 +1,6 @@
 from rest_framework import serializers
 import re
-
+from rest_framework_jwt.settings import api_settings
 
 from .models import User
 
@@ -43,10 +43,18 @@ class CreateUserSerializer(serializers.ModelSerializer):
         print("open保存")
         del validated_data['password2']
         del validated_data['allow']
+        # user = User.objects.create(**validated_data)# user = User.objects.create(**validated_data)
         user = User(**validated_data)
         # 调用django的认证系统加密密码
         user.set_password(validated_data['password'])
         user.save()
+        # 手动生成JWT token
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER  # 加载生成载荷函数
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER  # 加载生成token的函数
+        payload = jwt_payload_handler(user)  # 通过传入user对象生成jwt 载荷部分
+        token = jwt_encode_handler(payload)  # 传入payload 生成token
+        # 将token保存到user对象中，随着返回值返回给前端
+        user.token = token
         print("保存OK")
         return user
 
@@ -74,5 +82,50 @@ class CreateUserSerializer(serializers.ModelSerializer):
             }
         }
 
-class OnLine(serializers.ModelSerializer):
-    """登陆序列化机"""
+
+# class Chage_Password(serializers.ModelSerializer):
+#     """
+#     修改密码序列器
+#     """
+#     TODO 修改密码
+#     oldpassword = serializers.CharField(label='密码old', required=True, allow_null=False, allow_blank=False, write_only=True)
+#     password = serializers.CharField(label='密码new', required=True, allow_null=False, allow_blank=False, write_only=True)
+#     password1 = serializers.CharField(label='密码new1', required=True, allow_null=False, allow_blank=False, write_only=True)
+#
+#     def validate_oldpassword(self, value):
+#         """
+#         对旧密码进行验证
+#         """
+#         if not re.match(r'1[3-9]\d{9}', value):
+#             raise serializers.ValidationError('密码错误')
+#         return value
+#
+#     def validate(self, attrs):
+#         # 对两个密码进行判断
+#         if attrs.get('password') != attrs.get('password1'):
+#             raise serializers.ValidationError('两次密码不一致')
+#         return attrs
+#
+#     def create(self, validated_data):
+#         """重写序列化器的保存方法把多余数据移除(创建用户)"""
+#         print("open保存")
+#         del validated_data['password1']
+#         del validated_data['oldpassword']
+#         # user = User.objects.create(**validated_data)# user = User.objects.create(**validated_data)
+#         user = User(**validated_data)
+#         # 调用django的认证系统加密密码
+#         user.set_password(validated_data['password'])
+#         user.save()
+#         # 手动生成JWT token
+#         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER  # 加载生成载荷函数
+#         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER  # 加载生成token的函数
+#         payload = jwt_payload_handler(user)  # 通过传入user对象生成jwt 载荷部分
+#         token = jwt_encode_handler(payload)  # 传入payload 生成token
+#         # 将token保存到user对象中，随着返回值返回给前端
+#         user.token = token
+#         print("保存OK")
+#         return user
+#
+#     class Meta:
+#         model = User
+#         fields = ['oldpassword', 'password', 'password1']
