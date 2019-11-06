@@ -3,7 +3,7 @@ import re
 from rest_framework_jwt.settings import api_settings
 
 from .models import User
-
+from .utils import get_user_by_account
 
 class CreateUserSerializer(serializers.ModelSerializer):
     """
@@ -49,6 +49,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         # 手动生成JWT token
+        # jwt_payload_handler， jwt_encode_handler 对payload(数据) 进行加密
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER  # 加载生成载荷函数
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER  # 加载生成token的函数
         payload = jwt_payload_handler(user)  # 通过传入user对象生成jwt 载荷部分
@@ -83,49 +84,44 @@ class CreateUserSerializer(serializers.ModelSerializer):
         }
 
 
-# class Chage_Password(serializers.ModelSerializer):
-#     """
-#     修改密码序列器
-#     """
-#     TODO 修改密码
-#     oldpassword = serializers.CharField(label='密码old', required=True, allow_null=False, allow_blank=False, write_only=True)
-#     password = serializers.CharField(label='密码new', required=True, allow_null=False, allow_blank=False, write_only=True)
-#     password1 = serializers.CharField(label='密码new1', required=True, allow_null=False, allow_blank=False, write_only=True)
-#
-#     def validate_oldpassword(self, value):
-#         """
-#         对旧密码进行验证
-#         """
-#         if not re.match(r'1[3-9]\d{9}', value):
-#             raise serializers.ValidationError('密码错误')
-#         return value
-#
-#     def validate(self, attrs):
-#         # 对两个密码进行判断
-#         if attrs.get('password') != attrs.get('password1'):
-#             raise serializers.ValidationError('两次密码不一致')
-#         return attrs
-#
-#     def create(self, validated_data):
-#         """重写序列化器的保存方法把多余数据移除(创建用户)"""
-#         print("open保存")
-#         del validated_data['password1']
-#         del validated_data['oldpassword']
-#         # user = User.objects.create(**validated_data)# user = User.objects.create(**validated_data)
-#         user = User(**validated_data)
-#         # 调用django的认证系统加密密码
-#         user.set_password(validated_data['password'])
-#         user.save()
-#         # 手动生成JWT token
-#         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER  # 加载生成载荷函数
-#         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER  # 加载生成token的函数
-#         payload = jwt_payload_handler(user)  # 通过传入user对象生成jwt 载荷部分
-#         token = jwt_encode_handler(payload)  # 传入payload 生成token
-#         # 将token保存到user对象中，随着返回值返回给前端
-#         user.token = token
-#         print("保存OK")
-#         return user
-#
-#     class Meta:
-#         model = User
-#         fields = ['oldpassword', 'password', 'password1']
+class Chage_Password(serializers.ModelSerializer):
+    """
+    修改密码序列器
+    """
+    passwordold = serializers.CharField(label='确认密码old', required=True, allow_null=False, allow_blank=False, write_only=True)
+    # password1 = serializers.CharField(label='确认密码1', required=True, allow_null=False, allow_blank=False, write_only=True)
+    # password2 = serializers.CharField(label='确认密码2', required=True, allow_null=False, allow_blank=False, write_only=True)
+    # access_token = serializers.CharField(label='操作token', required=True, allow_null=False, write_only=True)
+
+    class Meta:
+        model = User
+        # fields = ('id', 'password1', 'password2', 'access_token','passwordold')
+        # fields = ('id', 'passwordold', 'password1', 'password2')
+        fields = ('id', 'passwordold')
+        extra_kwargs = {
+            'password': {
+                'write_only': True,
+                'min_length': 8,
+                'max_length': 20,
+                'error_messages': {
+                    'min_length': '仅允许8-20个字符的密码',
+                    'max_length': '仅允许8-20个字符的密码',
+                }
+            }
+        }
+
+    def validate(self, attrs):
+        """
+        校验数据
+        """
+        # 判断两次密码
+        if attrs.get('password1') != attrs.get('password2'):
+            raise serializers.ValidationError('两次密码不一致new')
+        return attrs
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    """用户个人信息序列化器"""
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'mobile', 'email', 'nickname', 'avatar', 'gender')

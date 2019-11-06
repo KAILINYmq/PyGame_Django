@@ -1,11 +1,14 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, GenericAPIView, ListAPIView
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import mixins
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
-from .serializers import CreateUserSerializer, Chage_Password
+from . import serializers
+from .serializers import CreateUserSerializer
 from .models import User
 
 class UsernameCountView(APIView):
@@ -21,6 +24,7 @@ class UsernameCountView(APIView):
         # 响应
         return Response(data)
 
+
 class MobileCountView(APIView):
     """判断手机号是否已存在"""
     def get(self, request, mobile):
@@ -33,6 +37,7 @@ class MobileCountView(APIView):
         # 响应
         return Response(data)
 
+
 class EmailCountView(APIView):
     """判断邮箱是否已存在"""
     def get(self, request, email):
@@ -44,6 +49,7 @@ class EmailCountView(APIView):
         }
         # 响应
         return Response(data)
+
 
 class UserView(CreateAPIView):
     """
@@ -74,12 +80,30 @@ class Changepassword(CreateAPIView):
     """
     修改密码
     """
-    # TODO 修改密码
-    # def post(self, request):
-    #     # 调用jwt父类的扩展方法，对用户登录的数据进行验证
-    #     response = super().post(request)
-    #
-    #     serializer = self.get_serializer(data=request.data)
-    #     if serializer.is_valid():
-    #         # 如果用户登陆则修改密码
-    #         serializer_class = Chage_Password  # 序列化器
+    # 补充通过认证才能访问接口的权限
+    # permission_classes = [IsAuthenticated]
+
+    serializer_class = serializers.Chage_Password
+
+class AddData(CreateAPIView):
+    """添加或修改信息"""
+    # 补充通过认证才能访问接口的权限
+    # permission_classes = [IsAuthenticated]
+
+
+
+
+class UserDetailView(RetrieveAPIView):
+    """
+    用户详情信息
+    """
+    serializer_class = serializers.UserDetailSerializer
+    # 补充通过认证才能访问接口的权限
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        """
+        返回请求的用户对象
+        :return: user
+        """
+        return self.request.user

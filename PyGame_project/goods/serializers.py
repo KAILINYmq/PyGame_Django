@@ -7,8 +7,6 @@ class SKUSerializer(serializers.ModelSerializer):
     SKU序列器
     """
     user_id = serializers.CharField(source='user_id.nickname')
-    # if user_id is "null":
-    #     user_id = serializers.CharField(source='user_id.mobile')
     category = serializers.CharField(source='category.name')
 
     class Meta:
@@ -49,6 +47,5 @@ class categorySku(serializers.ModelSerializer):
     """
     class Meta:
         model = SKU
-        # fields = ('id', 'title', 'logo_url')
         fields = ('id', 'create_time', 'title', 'game_content', 'category', 'user_id', 'zan_id',
                   'logo_url', 'img1_url', 'img2_url', 'game_file')

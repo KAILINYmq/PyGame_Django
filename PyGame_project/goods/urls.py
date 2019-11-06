@@ -12,7 +12,9 @@ urlpatterns = [
     url(r'^GameHOT/$', views.GameZAN.as_view()),
     # 游戏详情页接口
     url(r'^categories/(?P<id>\d+)/page/$', views.GamePage.as_view()),
-    # 游戏详情页
-    url(r'^categorys/(?P<id>\d+)/skus/$', views.Category_page_list.as_view()),
+    # 游戏分类页面
+    url(r'^categorys/(?P<category>\d+)/skus/$', views.Category_page_list.as_view()),
+    # 个人收藏页面url
+    url(r'^collect/$', views.UserCollect.as_view()),
 ]
 
