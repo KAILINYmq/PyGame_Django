@@ -15,6 +15,20 @@ class SKUSerializer(serializers.ModelSerializer):
                   'logo_url', 'img1_url', 'img2_url', 'game_file')
 
 
+class UPGameSKUSerializer(serializers.ModelSerializer):
+    """
+    UPGameSKU序列器
+    """
+    class Meta:
+        model = SKU
+        fields = ('id', 'create_time', 'title', 'game_content', 'category', 'user_id',
+                  'logo_url', 'img1_url', 'img2_url', 'game_file')
+        extra_kwargs = {
+            'zan_id': {
+                'read_only': True,
+            }
+        }
+
 class IndexSKU(serializers.ModelSerializer):
     """
     SKU序列器
@@ -22,6 +36,16 @@ class IndexSKU(serializers.ModelSerializer):
     class Meta:
         model = SKU
         fields = ('id', 'title', 'logo_url')
+
+
+class UserLaunchedserializers(serializers.ModelSerializer):
+    """
+    游戏待审核接口
+    """
+    class Meta:
+        model = SKU
+        fields = ('id', 'title', 'create_time', 'is_launched')
+
 
 class IndexSKUHOT(serializers.ModelSerializer):
     """

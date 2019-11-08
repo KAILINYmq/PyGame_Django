@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" >
+    <title>PyGame-邮箱验证成功</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/host.js"></script>
+       <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+    <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+</head>
+<body>
+    <div class="find_header">
+        <img style="width: 200px; height: 60px;" src="image/PyGame_logo.png">
+        <span class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;邮箱验证成功</span>
+    </div>
+
+    <div class="find_form" id="email_result">
+        <div v-if="success" class="pass_change_finish">恭喜您，邮箱验证成功！<br/><a href="/index.html">返回主页</a></div>
+        <div v-else class="pass_change_finish">链接已失效，验证失败，请重新验证！<br/><a href="/index.html">返回主页</a></div>
+    </div>
+
+    <div class="footer no-mp">
+        <div class="foot_link">
+            <a href="#">关于我们</a>
+            <span>|</span>
+            <a href="#">联系我们</a>
+            <span>|</span>
+            <a href="#">招聘人才</a>
+            <span>|</span>
+            <a href="#">友情链接</a>
+        </div>
+        <p>CopyRight © 2019 上海PyGame有限公司 All Rights Reserved</p>
+        <p>电话：010-****666    沪ICP备*******8号</p>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: '#email_result',
+            data: {
+                host,
+                success: true
+            },
+            mounted: function(){
+                axios.get(this.host+'/emails/verification/' + document.location.search)
+                    .then(response => {
+
+                         console.log("OK");
+                        this.success = true;
+                    })
+
+                    .catch(error => {
+                        console.log("错误");
+                        console.log(error);
+                        this.success = false;
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

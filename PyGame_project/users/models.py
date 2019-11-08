@@ -52,3 +52,34 @@ class User(AbstractUser):
         data = {'user_id': self.id}
         token = serializer.dumps(data)
         return token.decode()
+
+
+    def generate_smail_vereify_url(self):
+        """
+        生成邮箱验证链接
+        """
+        serializer = TJWSSerializer(settings.SECRET_KEY, expires_in=60 * 60 * 24)
+        data = {'user_id': self.id, 'email': self.email}
+        token = serializer.dumps(data)
+        verify_url = 'http://127.0.0.1:7999/success_verify_email.html?token=' + token.decode()
+        return verify_url
+
+
+    @staticmethod
+    def check_email_veerify_token(token):
+        """检验token"""
+        # 修改密码token有效期300
+        serializer = TJWSSerializer(settings.SECRET_KEY, expires_in=300)
+        try:
+            data = serializer.loads(token)
+        except BadData:
+            return False
+        else:
+            email = data.get('email')
+            user_id = data.get('user_id')
+            # user = User.objects.get(id=user_id, email=email)
+            # user.email_active = True
+            # user.save()
+            # 查询的同时，进行更新保存
+            User.objects.filter(id=user_id, email=email).update(email_active=True)
+            return True

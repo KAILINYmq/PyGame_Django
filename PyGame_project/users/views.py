@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, GenericAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
@@ -82,15 +83,41 @@ class Changepassword(CreateAPIView):
     """
     # 补充通过认证才能访问接口的权限
     # permission_classes = [IsAuthenticated]
-
     serializer_class = serializers.Chage_Password
+
 
 class AddData(CreateAPIView):
     """添加或修改信息"""
     # 补充通过认证才能访问接口的权限
     # permission_classes = [IsAuthenticated]
+    serializer_class = serializers.UserAddData
 
 
+class Emailbd(UpdateAPIView):
+    """
+    保存邮箱
+    """
+    serializer_class = serializers.EmailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+class EmailYZ(APIView):
+    """验证邮箱"""
+    def get(self, request):
+        # 获取token
+        token = request.query_params.get('token')
+        if not token:
+            return Response({'缺少token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 校验 保存
+        result = User.check_email_veerify_token(token)
+
+        if result:
+            return Response({"message": "OK"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"非法的token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailView(RetrieveAPIView):

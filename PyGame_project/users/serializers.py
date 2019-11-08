@@ -4,6 +4,7 @@ from rest_framework_jwt.settings import api_settings
 
 from .models import User
 from .utils import get_user_by_account
+from celery_tasks.emails.tasks import send_verify_email
 
 class CreateUserSerializer(serializers.ModelSerializer):
     """
@@ -82,6 +83,44 @@ class CreateUserSerializer(serializers.ModelSerializer):
                 }
             }
         }
+
+
+class UserAddData(serializers.ModelSerializer):
+    """
+    用户信息修改添加序列化器
+    """
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    """
+    绑定邮箱的序列化器
+    """
+    class Meta:
+        model = User
+        fields = ('id', 'email')
+        extra_kwargs = {
+            'email': {
+                # 表示email字段必须填
+                'required': True
+            }
+        }
+    # 使用update不用create因为视图里面return的user 到 instance   (instance=user)
+    def update(self, instance, validated_data):
+        """
+        重写更新方法，发送邮件
+        instance == user
+        """
+        # 获取用户发送的email字段
+        email = validated_data['email']
+        instance.email = email
+        instance.save()
+
+        # 生成激活链接
+        verify_url = instance.generate_smail_vereify_url()
+        # 发送验证邮件
+        send_verify_email.delay(email, verify_url)
+
+        return instance
 
 
 class Chage_Password(serializers.ModelSerializer):

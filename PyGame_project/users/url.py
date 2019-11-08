@@ -15,13 +15,15 @@ urlpatterns = [
     url(r'^authorizations/$', obtain_jwt_token),
     # url(r'^authorizations/$', views.UserAuthorizationView.as_view()),
     # 修改密码
+    # TODO
     url(r'^changepassword/$', views.Changepassword.as_view()),
     # 添加信息
+    # TODO
     url(r'^adddata/$', views.AddData.as_view()),
     # 获取用户信息
     url(r'^user/$', views.UserDetailView.as_view()),
     # 绑定邮箱url
-    # url(r'^emails/$', views.Emailbd.as_view()),
-    # 信息完善
-    # url(r'^')
+    url(r'^emails/$', views.Emailbd.as_view()),
+    # 检验邮箱
+    url(r'^emails/verification/$', views.EmailYZ.as_view()),
 ]
