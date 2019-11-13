@@ -57,7 +57,6 @@ class UserView(CreateAPIView):
     注册
     """
     # 指定序列化器
-    print("注册")
     serializer_class = CreateUserSerializer
 
 

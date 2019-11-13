@@ -10,7 +10,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
     """
     注册序列化器
     """
-    print("注册序列化器OK")
     password2 = serializers.CharField(label='密码2', required=True, allow_null=False, allow_blank=False, write_only=True)
     allow = serializers.CharField(label='同意协议', required=True, allow_null=False, allow_blank=False, write_only=True)
     """
@@ -57,11 +56,9 @@ class CreateUserSerializer(serializers.ModelSerializer):
         token = jwt_encode_handler(payload)  # 传入payload 生成token
         # 将token保存到user对象中，随着返回值返回给前端
         user.token = token
-        print("保存OK")
         return user
 
     class Meta:
-        print("MetaOK")
         model = User
         fields = ['username', 'password', 'password2', 'mobile', 'allow']
         extra_kwargs = {  # 对序列化器中的字段进行额外配置
@@ -127,36 +124,54 @@ class Chage_Password(serializers.ModelSerializer):
     """
     修改密码序列器
     """
-    passwordold = serializers.CharField(label='确认密码old', required=True, allow_null=False, allow_blank=False, write_only=True)
-    # password1 = serializers.CharField(label='确认密码1', required=True, allow_null=False, allow_blank=False, write_only=True)
-    # password2 = serializers.CharField(label='确认密码2', required=True, allow_null=False, allow_blank=False, write_only=True)
+    passwordold = serializers.CharField(label='确认密码old', required=True, allow_null=False, allow_blank=False)
+    passwordnew = serializers.CharField(label='确认密码1', required=True, allow_null=False, allow_blank=False)
+    passwordnew1 = serializers.CharField(label='确认密码2', required=True, allow_null=False, allow_blank=False)
     # access_token = serializers.CharField(label='操作token', required=True, allow_null=False, write_only=True)
 
     class Meta:
         model = User
         # fields = ('id', 'password1', 'password2', 'access_token','passwordold')
-        # fields = ('id', 'passwordold', 'password1', 'password2')
-        fields = ('id', 'passwordold')
-        extra_kwargs = {
-            'password': {
-                'write_only': True,
-                'min_length': 8,
-                'max_length': 20,
-                'error_messages': {
-                    'min_length': '仅允许8-20个字符的密码',
-                    'max_length': '仅允许8-20个字符的密码',
-                }
-            }
-        }
+        fields = ('id', 'passwordold', 'passwordnew', 'passwordnew1')
+        # extra_kwargs = {
+        #     'passwordold': {
+        #         'write_only': True,
+        #         'min_length': 8,
+        #         'max_length': 20,
+        #         'error_messages': {
+        #             'min_length': '仅允许8-20个字符的密码',
+        #             'max_length': '仅允许8-20个字符的密码',
+        #         }
+        #     }
+        # }
 
-    def validate(self, attrs):
+    # def validate(self, attrs):
+    #     """
+    #     校验数据
+    #     """
+    #     # 判断两次密码
+    #     if attrs.get('passwordnew') != attrs.get('passwordnew1'):
+    #         raise serializers.ValidationError('两次密码不一致new')
+    #     return attrs
+
+    # 使用update不用create因为视图里面return的user 到 instance   (instance=user)
+    def update(self, instance, validated_data):
         """
-        校验数据
+        重写更新方法, 更改密码
+        instance == user
         """
-        # 判断两次密码
-        if attrs.get('password1') != attrs.get('password2'):
-            raise serializers.ValidationError('两次密码不一致new')
-        return attrs
+        print(123)
+        # 获取用户发送的email字段
+        # email = validated_data['email']
+        # instance.email = email
+        # instance.save()
+        #
+        # # 生成激活链接
+        # verify_url = instance.generate_smail_vereify_url()
+        # # 发送验证邮件
+        # send_verify_email.delay(email, verify_url)
+
+        return instance
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

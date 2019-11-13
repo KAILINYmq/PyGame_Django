@@ -29,6 +29,24 @@ class UPGameSKUSerializer(serializers.ModelSerializer):
             }
         }
 
+    def validate(self, attrs):
+        #  判断是否有重复的游戏
+        try:
+            if SKU.objects.get(title=attrs.get('title')):
+                raise serializers.ValidationError('当前游戏已存在!')
+        except SKU.DoesNotExist:
+            pass
+
+        if str(attrs.get('logo_url'))[-3:] not in ['png', 'jpg', 'jpeg']:
+            raise serializers.ValidationError('请上传正确的图片!')
+        return attrs
+
+    def validate_game_file(self, value):
+        #  判断文件格式
+        if str(value)[-3:] not in ['rar', 'zip', 'jar']:
+            raise serializers.ValidationError('请上传正确的游戏文件！')
+        return value
+
 class IndexSKU(serializers.ModelSerializer):
     """
     SKU序列器
